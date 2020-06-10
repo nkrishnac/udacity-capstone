@@ -126,7 +126,7 @@
 - Once the datalake is created, run the airflow dag which populates data from S3 to Amazon Redshift
     - DAG: us_immigration.py
 - Monitor the DAG to error/completion in Airflow UI (DAG sample shown below)
-    ![alt text](![Airflow - US_Immigration_DAG](https://user-images.githubusercontent.com/23348082/84319143-891dae80-ab3d-11ea-8df1-e77ff59f49ca.png))
+![Airflow - US_Immigration_DAG](https://user-images.githubusercontent.com/23348082/84319143-891dae80-ab3d-11ea-8df1-e77ff59f49ca.png
 # Issues faced:
 - While laoding from S3 parquet files to Redshift, getting spectrum scan error saying unmatched columns between table and data file. Data in parquet files in S3 is fine and I couldn't figure out a solution for this even after lots of trouble shooting. Hence I loaded the raw data to S3 in csv format and then to redshift.
 - Similar to above, even when parquet files are having data, nothing is loaded into redshift (dim-airport had this issue)
