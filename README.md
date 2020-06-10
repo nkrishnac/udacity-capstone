@@ -1,6 +1,6 @@
 # Project Description:
 
-- As more and more immigrants come to the US for diffrent purposes, government agencies have the need to access this imformation quickly using reliable methods. Understanding this data can help politicians to reform the immigration so that they can bring in young and creative people from all the around the world which can help boost the US economy.
+- As more and more immigrants come to the US for diffrent purposes, government agencies have the need to access this information quickly using reliable methods. Understanding this data can help politicians to reform the immigration so that they can bring in young and creative people from all the around the world which can help boost the US economy.
 
 - To facilitate this, we have raw data available from different sources which are listed below. Using these we will transform and create a datalakes is S3 using pyspark and then load them to table is Redshift which can be queried to do analysis such as:
 
