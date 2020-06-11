@@ -138,4 +138,10 @@
 - Monitor the processes until completion so not to miss the SLA.
 
 # Future considerations and Improvements:
-- If the data manifolds 100 times - Instead of running spark session on few EC2 instances, create a cloud formation stack to spin up EMR cluster and create spark session to handle the volume. Also Airflow can be installed on the EMR cluster. Once the pipeline is completed, terminate the cluster for cost optimization. 
+- If the data manifolds 100 times 
+    - Instead of running spark session on few EC2 instances, create a cloud formation stack to spin up EMR cluster and create spark session to handle the volume. Also Airflow can be installed on the EMR cluster. Once the pipeline is completed, terminate the cluster for cost optimization. 
+    - Use Cassandra for heavy write applications to store online transactions as they come in. And then aggregate in Redshift to analyse.
+- The pipelines would be run on a daily basis by 7 AM every day
+    - Change the Airflow DAG schedule to run daily at 7 AM
+- The database needed to be accessed by 100+ people
+    - If using cassandra for write heavy applications, use pre-defined indexes to optimize read queries
