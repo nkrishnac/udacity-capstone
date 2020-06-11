@@ -3,8 +3,7 @@ import os
 from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator, BranchPythonOperator
-from airflow.operators import PostgresOperator
-from airflow.operators import CsvToRedshiftOperator
+from airflow.operators import (PostgresOperator, CsvToRedshiftOperator, DataQualityOperator, FactDataQualityOperator) 
 from airflow.models import Variable
 
 default_args = {
@@ -16,6 +15,7 @@ default_args = {
             'start_date': datetime.now(),
             'provide_context' :  True
 }
+
 
 dag = DAG('us_immigration_dag',
           catchup=False,
@@ -92,8 +92,14 @@ load_dim_us_airports_weather = CsvToRedshiftOperator(
         redshift_conn_id = 'redshift',
         iam_role = Variable.get("iam_role"),
         s3_bucket = Variable.get("s3_bucket"),
-        provide_context = True,
-        s3_key = 'csv/lake/us_airports_weather/'
+        provide_context = True,                                                                                                                                                                                                                         s3_key = 'csv/lake/us_airports_weather/'
+        )
+
+quality_check = DataQualityOperator(
+        task_id = 'dim_quality_check',
+        dag = dag,
+        redshift_conn_id = 'redshift',
+        tables = ["dim_city", "dim_airport_codes", "dim_us_cities_demographics", "dim_us_cities_temperatures", "dim_us_airports_weather"]
         )
 
 load_fact_immigrant_info = CsvToRedshiftOperator(
@@ -130,10 +136,17 @@ load_fact_immigration_demographics = CsvToRedshiftOperator(
         s3_key = 'csv/lake/immigration_demographic/'
         )
 
+fact_quality_check = FactDataQualityOperator(
+        task_id = 'fact_quality_check',
+        dag = dag,
+        redshift_conn_id = 'redshift',
+        tables = ["fact_immigrant_info", "fact_immigration_info", "fact_immigration_demographics"]
+        )
+
 end_operator = DummyOperator(
         task_id = 'Stop_execution',
         dag = dag
         )
 
 start_operator >> create_tables
-create_tables >> [load_dim_city, load_dim_airport_code, load_dim_us_cities_demographics, load_dim_us_cities_temperatures, load_dim_us_airports_weather] >> load_fact_immigrant_info >> load_fact_immigration_info >> load_fact_immigration_demographics >> end_operator
+create_tables >> [load_dim_city, load_dim_airport_code, load_dim_us_cities_demographics, load_dim_us_cities_temperatures, load_dim_us_airports_weather] >> quality_check >> load_fact_immigrant_info >> load_fact_immigration_info >> load_fact_immigration_demographics >> fact_quality_check >> end_operator
